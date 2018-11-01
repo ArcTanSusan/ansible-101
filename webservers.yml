@@ -1,0 +1,5 @@
+---
+ - hosts: webservers
+   sudo: yes
+   tasks:
+    - apt: name=bepress-data-structure-uti state=present
