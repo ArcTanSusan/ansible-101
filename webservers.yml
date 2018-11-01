@@ -1,5 +1,49 @@
 ---
  - hosts: webservers
-   sudo: yes
+   vars:
+    path_env: "{{ lookup('env','PATH') }}"
    tasks:
-    - apt: name=bepress-data-structure-uti state=present
+    - debug: msg="{{ lookup('env','PATH') }} is an environment variable"
+    - name: Install packages.
+      environment:
+        PATH: /root/.pyenv/shims:/root/.pyenv/bin:{{path_env}}
+      apt: name={{ item }} state=present update_cache=no
+      with_items:
+       - make
+       - libssl-dev
+       - zlib1g-dev
+       - libbz2-dev
+       - llvm
+       - libncurses5-dev
+       - libncursesw5-dev
+       - xz-utils
+       - tk-dev
+       - libffi-dev
+       - liblzma-dev
+       - build-essential
+       - python3
+       - libreadline-dev
+       - libsqlite3-dev
+      tags: install_basic_packages
+    - name: Install pyenv.
+      get_url:
+       url: https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer
+       dest: /usr/local/
+      tags: pyenv_install
+    - name: Run pyenv instatller.
+      shell: . /usr/local/pyenv-installer
+      tags: run_pyenv_installer
+    - name: Set pyenv to ~/.bashrc.
+      shell: echo 'export PYENV_ROOT=~/.pyenv' >> ~/.bashrc && \
+             echo 'export PYENV_VERSION=2.7.9' >> ~/.bashrc && \
+             echo 'export PATH="~/.pyenv/bin:{{path_env}}"' >> ~/.bashrc; \
+      tags: set_pyenv
+    - name: source bashrc to reload terminal with new env vars.
+      shell: . ~/.bashrc
+      tags: source_bashrc
+    - name: Install python 2.7.9.
+      shell: /root/.pyenv/bin/pyenv install 2.7.9
+      tags: pyenv_install_2_7_9
+    - name: Use python 2.7.9 globally in every new virtualenv.
+      shell: /root/.pyenv/bin/pyenv global 2.7.9
+      tags: pyenv_use_2_7_9
