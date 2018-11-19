@@ -3,6 +3,12 @@ A development-only test ansible repo that installs pyenv on 16.04.5 Ubuntu remot
 
 ## Usage
 
+Log in directly with
+
+```
+ssh root@104.248.68.192
+```
+
 This should print a "Hello World" to terminal on both the remote Ubuntu box and on localhost:
 
 `ansible-playbook hello.yml`
